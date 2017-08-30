@@ -37,7 +37,7 @@ class HubServer:
             'I': callId
         })
         if callback is not None:
-            self.__rspHandlers[ callId ] = callback
+            self.__rspHandlers[callId] = callback
 
 
 class HubClient(object):
