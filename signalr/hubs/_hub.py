@@ -22,7 +22,7 @@ class HubServer:
                 callId = int(kwargs['I'])
                 if callId in self.__rspHandlers:
                     rspArgs = kwargs['R'] if 'R' in kwargs else {}
-                    rspHandlers[callId](**rspArgs)
+                    rspHandlers[callId](rspArgs)
                     del rspHandlers[callId]
 
         connection.received += handle
