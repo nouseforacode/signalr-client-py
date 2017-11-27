@@ -1,6 +1,5 @@
 import json
 import sys
-from time import sleep
 
 import gevent
 
@@ -30,11 +29,6 @@ class WebSocketsTransport(Transport):
 
         return urlunparse(url_data)
 
-    def ping(self):
-        while True:
-            self.ws.ping()
-            sleep(1)
-
     def start(self):
         ws_url = self.__get_ws_url_from(self._get_url('connect'))
 
@@ -42,8 +36,6 @@ class WebSocketsTransport(Transport):
                                     header=self.__get_headers(),
                                     cookie=self.__get_cookie_str(),
                                     enable_multithread=True)
-        gevent.spawn(self.ping)
-        
         self._session.get(self._get_url('start'))
 
         def _receive():
