@@ -33,7 +33,7 @@ class WebSocketsTransport(Transport):
     def ping(self):
         while True:
             self.ws.ping()
-            sleep(60)
+            sleep(1)
 
     def start(self):
         ws_url = self.__get_ws_url_from(self._get_url('connect'))
