@@ -4,6 +4,8 @@ from signalr.events import EventHook
 from signalr.hubs import Hub
 from signalr.transports import AutoTransport
 
+import logging
+logger = logging.getLogger(__name__)
 
 class Connection:
     protocol_version = '1.5'
@@ -30,7 +32,12 @@ class Connection:
 
             self.error.fire(error)
 
+        def debug_connection(**kwargs):
+            logger.debug("Received: %s" % kwargs)
+            
+
         self.received += handle_error
+        self.received += debug_connection
 
         self.starting += self.__set_data
 
@@ -61,6 +68,7 @@ class Connection:
 
     def send(self, data):
         self.__transport.send(data)
+        logger.debug("Sent: %s" % data)
 
     def close(self):
         gevent.kill(self.__greenlet)

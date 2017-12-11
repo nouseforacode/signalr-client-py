@@ -9,6 +9,8 @@ else:
 
 import gevent
 
+import logging
+logger = logging.getLogger(__name__)
 
 class Transport:
     def __init__(self, session, connection):
@@ -23,7 +25,9 @@ class Transport:
         url = self.__get_base_url(self._connection,
                                   'negotiate',
                                   connectionData=self._connection.data)
+        logger.debug("Getting %s" % url)
         negotiate = self._session.get(url)
+        logger.debug("Response %s" % negotiate.text)
 
         negotiate.raise_for_status()
 

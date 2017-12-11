@@ -11,6 +11,9 @@ else:
 from websocket import create_connection
 from ._transport import Transport
 
+import logging
+logger = logging.getLogger(__name__)
+
 
 class WebSocketsTransport(Transport):
     def __init__(self, session, connection):
@@ -29,14 +32,23 @@ class WebSocketsTransport(Transport):
 
         return urlunparse(url_data)
 
+
     def start(self):
         ws_url = self.__get_ws_url_from(self._get_url('connect'))
-
+        header = self.__get_headers()
+        cookie = self.__get_cookie_str()
+        
+        logger.debug("Creating connection: %s\n\n\t%s\n\n\t%s" % (ws_url, "\n\t".join(header), "\n\t".join(cookie.split(';'))))
         self.ws = create_connection(ws_url,
-                                    header=self.__get_headers(),
-                                    cookie=self.__get_cookie_str(),
+                                    header=header,
+                                    cookie=cookie,
                                     enable_multithread=True)
-        self._session.get(self._get_url('start'))
+
+        start_url = self._get_url('start')
+        logger.debug("Getting %s" % start_url)
+
+        response = self._session.get(start_url)
+        logger.debug("Response %s" % response.text)
 
         def _receive():
             for notification in self.ws:
