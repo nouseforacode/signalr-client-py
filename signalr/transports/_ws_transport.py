@@ -32,7 +32,17 @@ class WebSocketsTransport(Transport):
 
         return urlunparse(url_data)
 
-
+    def beat(self):
+        while True:
+            try:
+                self.ws.send("{}")
+                logger.debug("ping")
+                gevent.sleep(1)
+            except Exception as e:
+                logger.error(e)
+                self._connection.close()
+                break
+        
     def start(self):
         ws_url = self.__get_ws_url_from(self._get_url('connect'))
         header = self.__get_headers()
@@ -44,6 +54,8 @@ class WebSocketsTransport(Transport):
                                     cookie=cookie,
                                     enable_multithread=True)
 
+        self.__beat = gevent.spawn(self.beat)
+        
         start_url = self._get_url('start')
         logger.debug("Getting %s" % start_url)
 
@@ -61,7 +73,11 @@ class WebSocketsTransport(Transport):
         gevent.sleep()
 
     def close(self):
-        self.ws.close()
+        gevent.kill(self.__beat)
+        try:
+            self.ws.close()
+        except:
+            pass
 
     def accept(self, negotiate_data):
         return bool(negotiate_data['TryWebSockets'])
